@@ -6,15 +6,15 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
-@Path("/hello")
+@Path("/")
 public class GreetingResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public String hello() {
+    public String root() {
 
-        Log.info("Hello from Quarkus REST");
-        return "Hello from Quarkus REST";
+        Log.info("Hello from Quarkus REST!");
+        return "Hello from Quarkus REST!";
 
 
 
