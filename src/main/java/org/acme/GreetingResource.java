@@ -2,6 +2,7 @@ package org.acme;
 
 import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.sqlclient.Pool;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -25,10 +26,9 @@ public class GreetingResource {
     @GET
     @Path("/version")
     @Produces(MediaType.TEXT_PLAIN)
-    public Multi<String> version() {
+    public Uni<String> version() {
         Log.info("Querying PostgreSQL version");
         return client.query("SELECT version()").execute()
-                .onItem().transformToMulti(set -> Multi.createFrom().iterable(set))
-                .onItem().transform(row -> row.getString(0));
+                .onItem().transform(set -> set.iterator().next().getString(0));
     }
 }
