@@ -1,7 +1,6 @@
 package org.acme;
 
 import io.quarkus.logging.Log;
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.sqlclient.Pool;
 import jakarta.inject.Inject;
