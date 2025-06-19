@@ -1,0 +1,69 @@
+name: build images and update templates
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: quarkus-pg
+      APP_NAME: quarkus-pg
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+      -
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+      -
+        name: Build with Maven
+        run: mvn clean compile package
+      -
+        name: Get current date
+        id: date_generator
+        run: echo "date=$(date -u +%Y%m%d-%H%M%S)" >> $GITHUB_OUTPUT
+      -
+        name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      -
+        name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: src/main/docker/Dockerfile.jvm
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:${{ github.sha }},${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/k3s-templates
+          token: ${{ secrets.TOKEN }}
+
+      -
+        name: Update template
+        run: |
+
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
+          sed -i "s|\(image: ${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:\).*|\1${{ github.sha }}|" ${{ env.APP_NAME }}/app_stack.yaml
+          git add .
+          git commit -m "Updated template to version: ${{ github.sha }}"
+          git push 
