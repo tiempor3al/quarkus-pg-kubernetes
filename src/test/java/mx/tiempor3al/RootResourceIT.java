@@ -1,8 +1,8 @@
-package org.acme;
+package mx.tiempor3al;
 
 import io.quarkus.test.junit.QuarkusIntegrationTest;
 
 @QuarkusIntegrationTest
-class GreetingResourceIT extends GreetingResourceTest {
+class RootResourceIT extends RootResourceTest {
     // Execute the same tests but in packaged mode.
 }
