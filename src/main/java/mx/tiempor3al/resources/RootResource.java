@@ -1,5 +1,6 @@
 package mx.tiempor3al.resources;
 
+import io.quarkus.logging.Log;
 import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -15,12 +16,11 @@ public class RootResource {
     @Inject
     DBService dbService;
 
-
-
     @GET
     @Path("/")
     @Produces(MediaType.TEXT_PLAIN)
     public Uni<String> version() {
-       return dbService.version();
+        Log.info("GET version");
+        return dbService.version();
     }
 }
