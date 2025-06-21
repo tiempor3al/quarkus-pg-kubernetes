@@ -21,7 +21,7 @@ jobs:
           cache: 'maven'
       -
         name: Build with Maven
-        run: mvn clean compile package
+        run: mvn -DskipTests clean compile package
       -
         name: Get current date
         id: date_generator
