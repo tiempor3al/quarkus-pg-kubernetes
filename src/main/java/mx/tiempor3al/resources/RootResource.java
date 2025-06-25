@@ -6,6 +6,7 @@ import io.smallrye.mutiny.Uni;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import mx.tiempor3al.models.Pokemon;
@@ -31,5 +32,13 @@ public class RootResource {
     public Multi<Pokemon> getAllPokemons() {
         Log.info("GET all pokemons");
         return dbService.getAllPokemons();
+    }
+
+    @GET
+    @Path("/trainers/{trainerId}/pokemons")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Multi<Pokemon> getPokemonsByTrainer(@PathParam("trainerId") Long trainerId) {
+        Log.info("GET pokemons for trainer: " + trainerId);
+        return dbService.getPokemonsByTrainer(trainerId);
     }
 }

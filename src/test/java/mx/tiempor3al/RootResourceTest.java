@@ -72,4 +72,64 @@ class RootResourceTest {
                 .body("[0].speed", is(90))
                 .body("[0].description", is("An Electric-type Pokemon that stores electricity in its cheeks"));
     }
+
+    @Test
+    void testPokemonsByTrainerEndpoint() {
+        // Create a sample Pokemon record
+        Pokemon pokemon = new Pokemon(
+            1L,
+            "Pikachu",
+            4L,
+            "Electric",
+            new BigDecimal("0.4"),
+            new BigDecimal("6.0"),
+            35,
+            55,
+            40,
+            50,
+            50,
+            90,
+            "An Electric-type Pokemon that stores electricity in its cheeks"
+        );
+
+        Long trainerId = 1L;
+
+        // Mock the DBService to return a stream with our sample Pokemon for the given trainer
+        when(dbService.getPokemonsByTrainer(trainerId)).thenReturn(Multi.createFrom().item(pokemon));
+
+        // Test the endpoint
+        given()
+            .when().get("/trainers/" + trainerId + "/pokemons")
+            .then()
+                .statusCode(200)
+                .body("[0].id", is(1))
+                .body("[0].name", is("Pikachu"))
+                .body("[0].typeId", is(4))
+                .body("[0].typeName", is("Electric"))
+                .body("[0].height", is(0.4f))
+                .body("[0].weight", is(6.0f))
+                .body("[0].hp", is(35))
+                .body("[0].attack", is(55))
+                .body("[0].defense", is(40))
+                .body("[0].specialAttack", is(50))
+                .body("[0].specialDefense", is(50))
+                .body("[0].speed", is(90))
+                .body("[0].description", is("An Electric-type Pokemon that stores electricity in its cheeks"));
+    }
+
+    @Test
+    void testPokemonsByTrainerEndpointNotFound() {
+        // Use a trainer ID that doesn't exist
+        Long nonExistentTrainerId = 999L;
+
+        // Mock the DBService to return an empty stream for the non-existent trainer
+        when(dbService.getPokemonsByTrainer(nonExistentTrainerId)).thenReturn(Multi.createFrom().empty());
+
+        // Test the endpoint - should return 200 OK with an empty array
+        given()
+            .when().get("/trainers/" + nonExistentTrainerId + "/pokemons")
+            .then()
+                .statusCode(200)
+                .body("", is(java.util.Collections.emptyList()));
+    }
 }
